@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  emailVerifiedAt    DateTime?
+  username           String?   @unique
+  pinHash            String?
+  failedPinAttempts  Int       @default(0)
+  lockedUntil        DateTime?
+  createdAt          DateTime  @default(now())
+
+  companies          Company[]
+}
+
+model Company {
+  id                  String         @id @default(cuid())
+  userId              String
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                String
+  startTime           String
+  endTime             String
+  workdays            Int[]
+  hourlyRate          Decimal        @db.Decimal(10, 2)
+  overtimeRule        OvertimeRule   @default(NONE)
+  overtimeMultiplier  Decimal        @db.Decimal(4, 2) @default(1.5)
+  payFrequency        String         @default("biweekly")
+  anchorPayday        DateTime       @db.Date
+  isActive            Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+
+  shifts              ShiftLog[]
+  reminderSettings    ReminderSettings?
+  reminderLogs        ReminderLog[]
+}
+
+enum OvertimeRule {
+  NONE
+  DAILY_OVER_8
+  WEEKLY_OVER_40
+}
+
+model ShiftLog {
+  id             String   @id @default(cuid())
+  companyId      String
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  workDate       DateTime @db.Date
+  startTime      String
+  endTime        String
+  hoursWorked    Decimal  @db.Decimal(6, 2)
+  overtimeHours  Decimal  @db.Decimal(6, 2) @default(0)
+  note           String?
+  isScheduled    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ReminderSettings {
+  id           String   @id @default(cuid())
+  companyId    String   @unique
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  enabled      Boolean  @default(true)
+  delayHours   Int      @default(3)
+  notifyEmail  String?
+}
+
+model ReminderLog {
+  id         String   @id @default(cuid())
+  companyId  String
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  workDate   DateTime @db.Date
+  sentAt     DateTime @default(now())
+}
