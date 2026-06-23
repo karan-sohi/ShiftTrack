@@ -37,6 +37,9 @@ yarn-error.log*
 CLAUDE.md
 AGENTS.md
 
+# Phase progress tracking
+.phase*.md
+
 # vercel
 .vercel
 

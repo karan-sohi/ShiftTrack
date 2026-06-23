@@ -12,9 +12,11 @@ model User {
   emailVerifiedAt    DateTime?
   username           String?   @unique
   pinHash            String?
-  failedPinAttempts  Int       @default(0)
-  lockedUntil        DateTime?
-  createdAt          DateTime  @default(now())
+  failedPinAttempts            Int       @default(0)
+  lockedUntil                  DateTime?
+  verificationCode             String?
+  verificationCodeExpiresAt    DateTime?
+  createdAt                    DateTime  @default(now())
 
   companies          Company[]
 }
