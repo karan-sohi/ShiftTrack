@@ -1,10 +1,13 @@
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-zinc-900">ShiftTrack</h1>
-        <p className="mt-2 text-zinc-500">Coming soon</p>
-      </div>
-    </div>
-  );
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+
+export default async function Home() {
+  const session = await getSession();
+  if (!session) redirect("/login");
+
+  const company = await prisma.company.findFirst({ where: { userId: session.userId } });
+  if (!company) redirect("/company/setup");
+
+  redirect("/dashboard");
 }
