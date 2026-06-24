@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 
 const SECRET = process.env.SESSION_SECRET!;
@@ -36,5 +37,15 @@ export function getSignupTokenFromRequest(req: NextRequest): SignupPayload | nul
   if (!token) return null;
   const payload = verifyToken<SignupPayload>(token);
   if (!payload || payload.type !== "signup") return null;
+  return payload;
+}
+
+// For use in Server Components and layouts (not Route Handlers)
+export async function getSession(): Promise<SessionPayload | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+  const payload = verifyToken<SessionPayload>(token);
+  if (!payload || payload.type !== "session") return null;
   return payload;
 }
