@@ -37,6 +37,7 @@ export default async function DashboardPage() {
 
   const period = getPeriodForDate(today, company.anchorPayday);
   const locked = isLocked(period);
+  const periodEndStr = period.periodEnd.toISOString().split("T")[0];
 
   const shifts = await prisma.shiftLog.findMany({
     where: { companyId: company.id, workDate: { gte: period.periodStart, lte: period.periodEnd } },
@@ -162,6 +163,13 @@ export default async function DashboardPage() {
               <span className="text-zinc-900">{fmtCurrency(totalPay)}</span>
             </div>
           </div>
+
+          <Link
+            href={`/payday/${periodEndStr}`}
+            className="mt-4 flex items-center justify-center h-10 rounded-xl bg-zinc-100 text-zinc-700 text-sm font-medium hover:bg-zinc-200 transition-colors"
+          >
+            View payday summary →
+          </Link>
         </div>
       </section>
 
