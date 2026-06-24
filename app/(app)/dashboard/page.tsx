@@ -206,6 +206,16 @@ export default async function DashboardPage() {
           </div>
         )}
       </section>
+
+      {/* Footer nav */}
+      <section className="px-4 mt-8 flex justify-center gap-6">
+        <Link href="/reminders" className="text-xs text-zinc-400 underline underline-offset-2">
+          Reminders
+        </Link>
+        <Link href="/company/setup" className="text-xs text-zinc-400 underline underline-offset-2">
+          Company settings
+        </Link>
+      </section>
     </div>
   );
 }
