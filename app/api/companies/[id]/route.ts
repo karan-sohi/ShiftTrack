@@ -74,6 +74,11 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/companies/
     data.anchorPayday = new Date(body.anchorPayday);
   }
   if (body.isActive !== undefined) data.isActive = Boolean(body.isActive);
+  if (body.timezone !== undefined) {
+    if (typeof body.timezone !== "string" || !body.timezone.trim())
+      return NextResponse.json({ error: "Invalid timezone" }, { status: 400 });
+    data.timezone = body.timezone.trim();
+  }
 
   const updated = await prisma.company.update({ where: { id: company!.id }, data });
   return NextResponse.json(updated);

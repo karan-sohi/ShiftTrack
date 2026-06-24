@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
       overtimeRule: body.overtimeRule,
       overtimeMultiplier: body.overtimeMultiplier ?? 1.5,
       anchorPayday: new Date(body.anchorPayday),
+      timezone: typeof body.timezone === "string" ? body.timezone : "America/Chicago",
     },
   });
 

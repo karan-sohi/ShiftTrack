@@ -5,6 +5,17 @@ import { useRouter } from "next/navigation";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+const TIMEZONES = [
+  { value: "America/New_York",    label: "Eastern (ET)" },
+  { value: "America/Chicago",     label: "Central (CT)" },
+  { value: "America/Denver",      label: "Mountain (MT)" },
+  { value: "America/Phoenix",     label: "Mountain — no DST (AZ)" },
+  { value: "America/Los_Angeles", label: "Pacific (PT)" },
+  { value: "America/Anchorage",   label: "Alaska (AKT)" },
+  { value: "Pacific/Honolulu",    label: "Hawaii (HT)" },
+  { value: "UTC",                 label: "UTC" },
+];
+
 export type CompanyFormData = {
   name: string;
   startTime: string;
@@ -14,6 +25,7 @@ export type CompanyFormData = {
   overtimeRule: "NONE" | "DAILY_OVER_8" | "WEEKLY_OVER_40";
   overtimeMultiplier: string;
   anchorPayday: string;
+  timezone: string;
 };
 
 type Props = {
@@ -31,6 +43,7 @@ const DEFAULTS: CompanyFormData = {
   overtimeRule: "NONE",
   overtimeMultiplier: "1.5",
   anchorPayday: "",
+  timezone: "America/Chicago",
 };
 
 export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Props) {
@@ -76,6 +89,7 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
       overtimeRule: form.overtimeRule,
       overtimeMultiplier: parseFloat(form.overtimeMultiplier) || 1.5,
       anchorPayday: form.anchorPayday,
+      timezone: form.timezone,
     };
 
     const res = await fetch(
@@ -87,10 +101,11 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
       }
     );
 
-    const data = await res.json();
     setLoading(false);
 
+    if (res.status === 401) { router.push("/login"); return; }
     if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
       setError(data.error ?? "Something went wrong");
       return;
     }
@@ -235,6 +250,22 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
           className="h-12 rounded-xl border border-zinc-200 bg-white px-4 text-zinc-900
                      focus:outline-none focus:ring-2 focus:ring-zinc-900"
         />
+      </div>
+
+      {/* Timezone */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium text-zinc-700">Timezone</label>
+        <select
+          value={form.timezone}
+          onChange={(e) => set("timezone", e.target.value)}
+          className="h-12 rounded-xl border border-zinc-200 bg-white px-4 text-zinc-900
+                     focus:outline-none focus:ring-2 focus:ring-zinc-900"
+        >
+          {TIMEZONES.map(({ value, label }) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+        <p className="text-xs text-zinc-400">Used for reminder timing</p>
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

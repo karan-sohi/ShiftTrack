@@ -71,10 +71,11 @@ export default function LogHoursForm({
       }),
     });
 
-    const data = await res.json();
     setLoading(false);
 
+    if (res.status === 401) { router.push("/login"); return; }
     if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
       setError(data.error ?? "Something went wrong");
       return;
     }
@@ -88,8 +89,9 @@ export default function LogHoursForm({
     setDeleting(true);
     const res = await fetch(`/api/shifts/${shiftId}`, { method: "DELETE" });
     setDeleting(false);
+    if (res.status === 401) { router.push("/login"); return; }
     if (!res.ok) {
-      const d = await res.json();
+      const d = await res.json().catch(() => ({}));
       setError(d.error ?? "Delete failed");
       return;
     }

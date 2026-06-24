@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   initialEnabled: boolean;
@@ -17,6 +18,7 @@ export default function RemindersForm({
   initialNotifyEmail,
   userEmail,
 }: Props) {
+  const router = useRouter();
   const [enabled, setEnabled] = useState(initialEnabled);
   const [delayHours, setDelayHours] = useState(initialDelayHours);
   const [notifyEmail, setNotifyEmail] = useState(initialNotifyEmail ?? "");
@@ -41,8 +43,9 @@ export default function RemindersForm({
 
     setSaving(false);
 
+    if (res.status === 401) { router.push("/login"); return; }
     if (!res.ok) {
-      const d = await res.json();
+      const d = await res.json().catch(() => ({}));
       setError(d.error ?? "Failed to save");
       return;
     }

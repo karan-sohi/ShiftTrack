@@ -6,19 +6,38 @@ function toDateStr(d: Date): string {
   return d.toISOString().split("T")[0];
 }
 
-// Compute the wall-clock end datetime for a scheduled shift on `workDate`.
-// Handles overnight: if endTime <= startTime, the shift ends the following calendar day.
-function shiftEndDatetime(workDate: Date, startTime: string, endTime: string): Date {
+// Returns (local_time_ms - utc_time_ms) / 60000 for the given timezone at `at`.
+// e.g. America/Chicago CDT (UTC-5) → -300
+function tzOffsetMinutes(timezone: string, at: Date): number {
+  const localStr = at.toLocaleString("en-US", { timeZone: timezone });
+  const utcStr  = at.toLocaleString("en-US", { timeZone: "UTC" });
+  return (new Date(localStr).getTime() - new Date(utcStr).getTime()) / 60000;
+}
+
+// Compute the UTC timestamp for when a shift ends, accounting for company timezone.
+// workDate is UTC midnight for the shift's start date.
+// endTime / startTime are "HH:MM" in the company's local timezone.
+function shiftEndUTC(
+  workDate: Date,
+  startTime: string,
+  endTime: string,
+  timezone: string
+): Date {
   const [sh, sm] = startTime.split(":").map(Number);
   const [eh, em] = endTime.split(":").map(Number);
-  // workDate is UTC midnight; use UTC arithmetic to stay consistent
-  const end = new Date(workDate);
-  end.setUTCHours(eh, em, 0, 0);
-  if (eh * 60 + em <= sh * 60 + sm) {
-    // overnight — ends next day
-    end.setUTCDate(end.getUTCDate() + 1);
-  }
-  return end;
+
+  // Determine which calendar date the shift ends on (in company timezone)
+  const isOvernight = eh * 60 + em <= sh * 60 + sm;
+  let endDateUTC = new Date(workDate); // UTC midnight of start date
+  if (isOvernight) endDateUTC = new Date(endDateUTC.getTime() + 24 * 60 * 60 * 1000);
+
+  // Find what UTC time corresponds to 00:00 local on endDate.
+  // offsetMin = local - UTC, so UTC midnight_local = UTC midnight - offsetMin
+  const offsetMin = tzOffsetMinutes(timezone, endDateUTC);
+  const localMidnightUTC = endDateUTC.getTime() - offsetMin * 60000;
+
+  // Add the end-time hours/minutes
+  return new Date(localMidnightUTC + (eh * 60 + em) * 60000);
 }
 
 export async function GET(req: NextRequest) {
@@ -61,7 +80,7 @@ export async function GET(req: NextRequest) {
       }
 
       // Skip if shift hasn't exceeded delay window yet
-      const shiftEnd = shiftEndDatetime(workDate, company.startTime, company.endTime);
+      const shiftEnd = shiftEndUTC(workDate, company.startTime, company.endTime, company.timezone);
       const cutoff = new Date(shiftEnd.getTime() + s.delayHours * 60 * 60 * 1000);
       if (now < cutoff) {
         skipped++;

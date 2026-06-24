@@ -34,6 +34,7 @@ model Company {
   overtimeMultiplier  Decimal        @db.Decimal(4, 2) @default(1.5)
   payFrequency        String         @default("biweekly")
   anchorPayday        DateTime       @db.Date
+  timezone            String         @default("America/Chicago")
   isActive            Boolean        @default(true)
   createdAt           DateTime       @default(now())
 
