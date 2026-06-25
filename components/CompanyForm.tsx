@@ -78,7 +78,7 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
     );
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
 
@@ -122,6 +122,7 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
     }
 
     router.push(redirectTo);
+    router.refresh();
   }
 
   return (
