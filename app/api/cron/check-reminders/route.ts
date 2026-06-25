@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
   }
 
   const now = new Date();
-  const lookbackDays = 7;
+  const lookbackDays = 2; // today + yesterday (covers late-night shifts that end past midnight)
 
   const allSettings = await prisma.reminderSettings.findMany({
     where: { enabled: true },
