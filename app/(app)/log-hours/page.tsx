@@ -40,6 +40,7 @@ export default async function LogHoursPage({
             companyId={company.id}
             hourlyRate={Number(company.hourlyRate)}
             overtimeMultiplier={Number(company.overtimeMultiplier)}
+            breakMinutes={company.breakMinutes}
             defaultDate={shift.workDate.toISOString().split("T")[0]}
             defaultStart={shift.startTime}
             defaultEnd={shift.endTime}
@@ -65,6 +66,7 @@ export default async function LogHoursPage({
           companyId={company.id}
           hourlyRate={Number(company.hourlyRate)}
           overtimeMultiplier={Number(company.overtimeMultiplier)}
+          breakMinutes={company.breakMinutes}
           defaultDate={date ?? today}
           defaultStart={company.startTime}
           defaultEnd={company.endTime}

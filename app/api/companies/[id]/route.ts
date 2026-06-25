@@ -79,9 +79,20 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/companies/
       return NextResponse.json({ error: "Invalid timezone" }, { status: 400 });
     data.timezone = body.timezone.trim();
   }
+  if (body.breakMinutes !== undefined) {
+    const mins = Number(body.breakMinutes);
+    if (!Number.isInteger(mins) || mins < 0 || mins > 120)
+      return NextResponse.json({ error: "breakMinutes must be 0–120" }, { status: 400 });
+    data.breakMinutes = mins;
+  }
 
-  const updated = await prisma.company.update({ where: { id: company!.id }, data });
-  return NextResponse.json(updated);
+  try {
+    const updated = await prisma.company.update({ where: { id: company!.id }, data });
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error("PATCH /api/companies/[id] error:", err);
+    return NextResponse.json({ error: "Failed to update company" }, { status: 500 });
+  }
 }
 
 export async function DELETE(req: NextRequest, ctx: RouteContext<"/api/companies/[id]">) {

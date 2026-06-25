@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   if (!company || company.userId !== session.userId)
     return NextResponse.json({ error: "Company not found" }, { status: 404 });
 
-  const hoursWorked = computeShiftHours(startTime, endTime);
+  const hoursWorked = computeShiftHours(startTime, endTime, company.breakMinutes);
   let overtimeHours = 0;
 
   if (company.overtimeRule === "DAILY_OVER_8") {

@@ -44,16 +44,18 @@ export default async function DashboardPage() {
     orderBy: { workDate: "desc" },
   });
 
+  type Shift = (typeof shifts)[number];
+
   const todayShift = shifts.find(
-    (s) => s.workDate.toISOString().split("T")[0] === todayStr
+    (s: Shift) => s.workDate.toISOString().split("T")[0] === todayStr
   );
 
   const isTodayWorkday = company.workdays.includes(today.getDay());
-  const shiftLength = computeShiftHours(company.startTime, company.endTime);
+  const shiftLength = computeShiftHours(company.startTime, company.endTime, company.breakMinutes);
 
   // Period stats
-  const totalHours = shifts.reduce((s, r) => s + Number(r.hoursWorked), 0);
-  const totalOT = shifts.reduce((s, r) => s + Number(r.overtimeHours), 0);
+  const totalHours = shifts.reduce((sum: number, r: Shift) => sum + Number(r.hoursWorked), 0);
+  const totalOT = shifts.reduce((sum: number, r: Shift) => sum + Number(r.overtimeHours), 0);
   const regularHours = totalHours - totalOT;
   const rate = Number(company.hourlyRate);
   const mult = Number(company.overtimeMultiplier);
@@ -180,7 +182,7 @@ export default async function DashboardPage() {
           <p className="text-sm text-zinc-400 text-center py-10">No shifts logged yet this period.</p>
         ) : (
           <div className="flex flex-col gap-2">
-            {shifts.map((s) => {
+            {shifts.map((s: Shift) => {
               const ot = Number(s.overtimeHours);
               const hrs = Number(s.hoursWorked);
               const pay = (hrs - ot) * rate + ot * rate * mult;
@@ -212,7 +214,7 @@ export default async function DashboardPage() {
         <Link href="/reminders" className="text-xs text-zinc-400 underline underline-offset-2">
           Reminders
         </Link>
-        <Link href="/company/setup" className="text-xs text-zinc-400 underline underline-offset-2">
+        <Link href={`/company/${company.id}/edit`} className="text-xs text-zinc-400 underline underline-offset-2">
           Company settings
         </Link>
       </section>

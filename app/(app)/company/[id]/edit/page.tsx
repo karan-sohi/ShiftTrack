@@ -25,6 +25,7 @@ export default async function EditCompanyPage({
     overtimeMultiplier: company.overtimeMultiplier.toString(),
     anchorPayday: company.anchorPayday.toISOString().split("T")[0],
     timezone: company.timezone,
+    breakMinutes: company.breakMinutes,
   };
 
   return (

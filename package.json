@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "PRISMA_SCHEMA_ENGINE_BINARY=/Users/karan/prisma-engines/schema-engine prisma generate && next dev",
+    "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest"

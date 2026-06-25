@@ -45,7 +45,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/shifts/[id
   if (!/^\d{2}:\d{2}$/.test(newStart) || !/^\d{2}:\d{2}$/.test(newEnd))
     return NextResponse.json({ error: "Times must be HH:MM format" }, { status: 400 });
 
-  const hoursWorked = computeShiftHours(newStart, newEnd);
+  const hoursWorked = computeShiftHours(newStart, newEnd, company.breakMinutes);
   let overtimeHours = 0;
 
   if (company.overtimeRule === "DAILY_OVER_8") {

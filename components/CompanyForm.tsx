@@ -26,6 +26,7 @@ export type CompanyFormData = {
   overtimeMultiplier: string;
   anchorPayday: string;
   timezone: string;
+  breakMinutes: number;
 };
 
 type Props = {
@@ -33,6 +34,14 @@ type Props = {
   companyId?: string;
   redirectTo?: string;
 };
+
+const BREAK_OPTIONS = [
+  { value: 0,  label: "No break" },
+  { value: 15, label: "15 min" },
+  { value: 30, label: "30 min" },
+  { value: 45, label: "45 min" },
+  { value: 60, label: "60 min" },
+];
 
 const DEFAULTS: CompanyFormData = {
   name: "",
@@ -44,6 +53,7 @@ const DEFAULTS: CompanyFormData = {
   overtimeMultiplier: "1.5",
   anchorPayday: "",
   timezone: "America/Chicago",
+  breakMinutes: 0,
 };
 
 export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Props) {
@@ -90,6 +100,7 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
       overtimeMultiplier: parseFloat(form.overtimeMultiplier) || 1.5,
       anchorPayday: form.anchorPayday,
       timezone: form.timezone,
+      breakMinutes: form.breakMinutes,
     };
 
     const res = await fetch(
@@ -158,6 +169,27 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
             Overnight shift — ends the following day
           </p>
         )}
+      </div>
+
+      {/* Unpaid break */}
+      <div className="flex flex-col gap-2">
+        <p className="text-sm font-medium text-zinc-700">Unpaid break</p>
+        <div className="flex gap-2 flex-wrap">
+          {BREAK_OPTIONS.map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => set("breakMinutes", value)}
+              className={`h-10 px-4 rounded-xl text-sm font-medium border transition-colors
+                          ${form.breakMinutes === value
+                            ? "bg-zinc-900 text-white border-zinc-900"
+                            : "bg-white text-zinc-600 border-zinc-200"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-zinc-400">Deducted from every logged shift</p>
       </div>
 
       {/* Workdays */}

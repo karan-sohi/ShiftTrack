@@ -22,22 +22,27 @@ export async function POST(req: NextRequest) {
   const err = validateCompanyBody(body);
   if (err) return NextResponse.json({ error: err }, { status: 400 });
 
-  const company = await prisma.company.create({
-    data: {
-      userId: session.userId,
-      name: body.name.trim(),
-      startTime: body.startTime,
-      endTime: body.endTime,
-      workdays: body.workdays,
-      hourlyRate: body.hourlyRate,
-      overtimeRule: body.overtimeRule,
-      overtimeMultiplier: body.overtimeMultiplier ?? 1.5,
-      anchorPayday: new Date(body.anchorPayday),
-      timezone: typeof body.timezone === "string" ? body.timezone : "America/Chicago",
-    },
-  });
-
-  return NextResponse.json(company, { status: 201 });
+  try {
+    const company = await prisma.company.create({
+      data: {
+        userId: session.userId,
+        name: body.name.trim(),
+        startTime: body.startTime,
+        endTime: body.endTime,
+        workdays: body.workdays,
+        hourlyRate: body.hourlyRate,
+        overtimeRule: body.overtimeRule,
+        overtimeMultiplier: body.overtimeMultiplier ?? 1.5,
+        anchorPayday: new Date(body.anchorPayday),
+        timezone: typeof body.timezone === "string" ? body.timezone : "America/Chicago",
+        breakMinutes: typeof body.breakMinutes === "number" && body.breakMinutes >= 0 ? body.breakMinutes : 0,
+      },
+    });
+    return NextResponse.json(company, { status: 201 });
+  } catch (err) {
+    console.error("POST /api/companies error:", err);
+    return NextResponse.json({ error: "Failed to create company" }, { status: 500 });
+  }
 }
 
 function validateCompanyBody(body: Record<string, unknown> | null): string | null {

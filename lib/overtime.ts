@@ -3,11 +3,15 @@ function timeToMinutes(time: string): number {
   return h * 60 + m;
 }
 
-export function computeShiftHours(startTime: string, endTime: string): number {
+export function computeShiftHours(
+  startTime: string,
+  endTime: string,
+  breakMinutes = 0
+): number {
   const startMin = timeToMinutes(startTime);
   let endMin = timeToMinutes(endTime);
   if (endMin <= startMin) endMin += 24 * 60; // overnight
-  return (endMin - startMin) / 60;
+  return Math.max(0, (endMin - startMin - breakMinutes) / 60);
 }
 
 export function computeDailyOvertime(hoursWorked: number): number {

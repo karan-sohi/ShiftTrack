@@ -35,6 +35,7 @@ model Company {
   payFrequency        String         @default("biweekly")
   anchorPayday        DateTime       @db.Date
   timezone            String         @default("America/Chicago")
+  breakMinutes        Int            @default(0)
   isActive            Boolean        @default(true)
   createdAt           DateTime       @default(now())
 

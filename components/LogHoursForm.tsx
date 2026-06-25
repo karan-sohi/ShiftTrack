@@ -7,6 +7,7 @@ type Props = {
   companyId: string;
   hourlyRate: number;
   overtimeMultiplier: number;
+  breakMinutes: number;
   defaultDate: string;
   defaultStart: string;
   defaultEnd: string;
@@ -15,13 +16,13 @@ type Props = {
   defaultNote?: string;
 };
 
-function shiftHours(start: string, end: string): number {
+function shiftHours(start: string, end: string, breakMinutes: number): number {
   const [sh, sm] = start.split(":").map(Number);
   const [eh, em] = end.split(":").map(Number);
   let endMin = eh * 60 + em;
   const startMin = sh * 60 + sm;
   if (endMin <= startMin) endMin += 24 * 60;
-  return (endMin - startMin) / 60;
+  return Math.max(0, (endMin - startMin - breakMinutes) / 60);
 }
 
 function fmtCurrency(n: number) {
@@ -32,6 +33,7 @@ export default function LogHoursForm({
   companyId,
   hourlyRate,
   overtimeMultiplier,
+  breakMinutes,
   defaultDate,
   defaultStart,
   defaultEnd,
@@ -49,7 +51,7 @@ export default function LogHoursForm({
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
 
-  const hours = start && end ? shiftHours(start, end) : 0;
+  const hours = start && end ? shiftHours(start, end, breakMinutes) : 0;
   const isOvernight = end <= start;
   const estimatedPay = hours * hourlyRate;
 
@@ -150,7 +152,9 @@ export default function LogHoursForm({
             <p className="text-sm font-semibold text-zinc-900">
               {hours % 1 === 0 ? hours.toFixed(0) : hours.toFixed(2)} hours
             </p>
-            <p className="text-xs text-zinc-500 mt-0.5">Estimated pay</p>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              {breakMinutes > 0 ? `${breakMinutes} min break deducted · ` : ""}Estimated pay
+            </p>
           </div>
           <p className="text-lg font-bold text-zinc-900">{fmtCurrency(estimatedPay)}</p>
         </div>
