@@ -32,6 +32,12 @@ export default async function DashboardPage() {
 
   if (!company) redirect("/company/setup");
 
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { email: true, username: true },
+  });
+  const userInitial = ((user?.username ?? user?.email) ?? "?")[0].toUpperCase();
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayStr = today.toISOString().split("T")[0];
@@ -72,19 +78,27 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-zinc-50 pb-28">
       {/* Header */}
-      <div className="px-4 pt-12 pb-4 flex items-start justify-between border-b border-zinc-100">
+      <div className="px-4 pt-12 pb-4 flex items-center justify-between border-b border-zinc-100">
         <div>
           <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">ShiftTrack</p>
           <h1 className="text-2xl font-bold text-zinc-900 mt-0.5">{company.name}</h1>
         </div>
-        {!locked && (
+        <div className="flex items-center gap-2">
           <Link
-            href="/log-hours"
-            className="bg-zinc-900 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm active:bg-zinc-700 transition-colors"
+            href="/account"
+            className="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-white text-sm font-bold shrink-0 active:bg-zinc-700 transition-colors"
           >
-            + Log hours
+            {userInitial}
           </Link>
-        )}
+          {!locked && (
+            <Link
+              href="/log-hours"
+              className="bg-zinc-900 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm active:bg-zinc-700 transition-colors"
+            >
+              + Log hours
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Today */}
@@ -260,7 +274,14 @@ export default async function DashboardPage() {
           href={`/company/${company.id}/edit`}
           className="flex-1 flex flex-col items-center py-3.5 text-zinc-500 active:bg-zinc-50 transition-colors"
         >
-          <span className="text-xs font-medium">Company settings</span>
+          <span className="text-xs font-medium">Settings</span>
+        </Link>
+        <div className="w-px bg-zinc-200" />
+        <Link
+          href="/account"
+          className="flex-1 flex flex-col items-center py-3.5 text-zinc-500 active:bg-zinc-50 transition-colors"
+        >
+          <span className="text-xs font-medium">Account</span>
         </Link>
       </nav>
     </div>
