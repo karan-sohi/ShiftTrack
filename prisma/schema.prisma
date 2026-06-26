@@ -36,6 +36,7 @@ model Company {
   anchorPayday        DateTime       @db.Date
   timezone            String         @default("America/Chicago")
   breakMinutes        Int            @default(0)
+  shiftPremiumRate    Decimal        @default(0) @db.Decimal(6, 2)
   isActive            Boolean        @default(true)
   createdAt           DateTime       @default(now())
 
@@ -60,6 +61,7 @@ model ShiftLog {
   hoursWorked    Decimal  @db.Decimal(6, 2)
   overtimeHours  Decimal  @db.Decimal(6, 2) @default(0)
   note           String?
+  premiumPay     Decimal  @default(0) @db.Decimal(8, 2)
   isScheduled    Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

@@ -26,6 +26,7 @@ export default async function EditCompanyPage({
     anchorPayday: company.anchorPayday.toISOString().split("T")[0],
     timezone: company.timezone,
     breakMinutes: company.breakMinutes,
+    shiftPremiumRate: Number(company.shiftPremiumRate) > 0 ? company.shiftPremiumRate.toString() : "",
   };
 
   return (

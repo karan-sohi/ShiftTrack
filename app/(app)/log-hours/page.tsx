@@ -16,7 +16,8 @@ export default async function LogHoursPage({
 
   const company = await prisma.company.findFirst({
     where: { userId: session.userId, isActive: true },
-  }) ?? await prisma.company.findFirst({ where: { userId: session.userId } });
+    orderBy: { createdAt: "desc" },
+  }) ?? await prisma.company.findFirst({ where: { userId: session.userId }, orderBy: { createdAt: "desc" } });
 
   if (!company) redirect("/company/setup");
 
@@ -41,10 +42,12 @@ export default async function LogHoursPage({
             hourlyRate={Number(company.hourlyRate)}
             overtimeMultiplier={Number(company.overtimeMultiplier)}
             breakMinutes={company.breakMinutes}
+            shiftPremiumRate={Number(company.shiftPremiumRate)}
             defaultDate={shift.workDate.toISOString().split("T")[0]}
             defaultStart={shift.startTime}
             defaultEnd={shift.endTime}
             defaultNote={shift.note ?? ""}
+            defaultPremium={Number(shift.premiumPay) > 0}
             shiftId={shift.id}
           />
         </div>
@@ -67,6 +70,7 @@ export default async function LogHoursPage({
           hourlyRate={Number(company.hourlyRate)}
           overtimeMultiplier={Number(company.overtimeMultiplier)}
           breakMinutes={company.breakMinutes}
+          shiftPremiumRate={Number(company.shiftPremiumRate)}
           defaultDate={date ?? today}
           defaultStart={company.startTime}
           defaultEnd={company.endTime}

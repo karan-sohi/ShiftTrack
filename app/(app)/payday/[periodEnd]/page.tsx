@@ -32,7 +32,8 @@ export default async function PaydaySummaryPage({
 
   const company = await prisma.company.findFirst({
     where: { userId: session.userId, isActive: true },
-  }) ?? await prisma.company.findFirst({ where: { userId: session.userId } });
+    orderBy: { createdAt: "desc" },
+  }) ?? await prisma.company.findFirst({ where: { userId: session.userId }, orderBy: { createdAt: "desc" } });
 
   if (!company) redirect("/company/setup");
 
@@ -61,14 +62,16 @@ export default async function PaydaySummaryPage({
   // Compute totals
   let totalHours = 0;
   let totalOT = 0;
+  let totalPremium = 0;
   for (const s of shifts) {
     totalHours += Number(s.hoursWorked);
     totalOT += Number(s.overtimeHours);
+    totalPremium += Number(s.premiumPay);
   }
   const regularHours = totalHours - totalOT;
   const regularPay = regularHours * rate;
   const otPay = totalOT * rate * mult;
-  const grossPay = regularPay + otPay;
+  const grossPay = regularPay + otPay + totalPremium;
 
   return (
     <div className="min-h-screen bg-zinc-50 pb-12">
@@ -141,6 +144,12 @@ export default async function PaydaySummaryPage({
               <span className="font-medium text-zinc-900">{fmtCurrency(otPay)}</span>
             </div>
           )}
+          {totalPremium > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-zinc-500">Shift premium</span>
+              <span className="font-medium text-zinc-900">{fmtCurrency(totalPremium)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm font-bold pt-2 border-t border-zinc-100">
             <span className="text-zinc-900">Total</span>
             <span className="text-zinc-900">{fmtCurrency(grossPay)}</span>
@@ -170,8 +179,9 @@ export default async function PaydaySummaryPage({
             {shifts.map((s) => {
               const h = Number(s.hoursWorked);
               const ot = Number(s.overtimeHours);
+              const premium = Number(s.premiumPay);
               const reg = h - ot;
-              const dayPay = reg * rate + ot * rate * mult;
+              const dayPay = reg * rate + ot * rate * mult + premium;
               return (
                 <div
                   key={s.id}
@@ -191,11 +201,18 @@ export default async function PaydaySummaryPage({
                       <p className="text-xs text-zinc-400 mt-0.5">{fmtHours(h)}</p>
                     </div>
                   </div>
-                  {ot > 0 && (
+                  {(ot > 0 || premium > 0) && (
                     <div className="mt-2 flex items-center gap-1.5">
-                      <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
-                        {fmtHours(ot)} OT
-                      </span>
+                      {ot > 0 && (
+                        <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
+                          {fmtHours(ot)} OT
+                        </span>
+                      )}
+                      {premium > 0 && (
+                        <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
+                          +{fmtCurrency(premium)} premium
+                        </span>
+                      )}
                     </div>
                   )}
                   {s.note && (

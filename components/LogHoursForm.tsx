@@ -8,12 +8,14 @@ type Props = {
   hourlyRate: number;
   overtimeMultiplier: number;
   breakMinutes: number;
+  shiftPremiumRate: number;
   defaultDate: string;
   defaultStart: string;
   defaultEnd: string;
   // edit mode
   shiftId?: string;
   defaultNote?: string;
+  defaultPremium?: boolean;
 };
 
 function shiftHours(start: string, end: string, breakMinutes: number): number {
@@ -32,13 +34,14 @@ function fmtCurrency(n: number) {
 export default function LogHoursForm({
   companyId,
   hourlyRate,
-  overtimeMultiplier,
   breakMinutes,
+  shiftPremiumRate,
   defaultDate,
   defaultStart,
   defaultEnd,
   shiftId,
   defaultNote = "",
+  defaultPremium = false,
 }: Props) {
   const router = useRouter();
   const isEdit = Boolean(shiftId);
@@ -47,15 +50,17 @@ export default function LogHoursForm({
   const [start, setStart] = useState(defaultStart);
   const [end, setEnd] = useState(defaultEnd);
   const [note, setNote] = useState(defaultNote);
+  const [applyPremium, setApplyPremium] = useState(defaultPremium);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   const hours = start && end ? shiftHours(start, end, breakMinutes) : 0;
   const isOvernight = end <= start;
-  const estimatedPay = hours * hourlyRate;
+  const premiumPay = applyPremium ? shiftPremiumRate * hours : 0;
+  const estimatedPay = hours * hourlyRate + premiumPay;
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     if (!date || !start || !end) return setError("Date, start, and end time required");
@@ -70,6 +75,7 @@ export default function LogHoursForm({
         startTime: start,
         endTime: end,
         note: note || null,
+        applyPremium,
       }),
     });
 
@@ -145,6 +151,23 @@ export default function LogHoursForm({
         </p>
       )}
 
+      {/* Shift premium toggle */}
+      {shiftPremiumRate > 0 && (
+        <button
+          type="button"
+          onClick={() => setApplyPremium((v) => !v)}
+          className={`h-12 rounded-xl border text-sm font-medium transition-colors flex items-center justify-between px-4
+            ${applyPremium
+              ? "bg-zinc-900 text-white border-zinc-900"
+              : "bg-white text-zinc-600 border-zinc-200"}`}
+        >
+          <span>Shift premium (+{fmtCurrency(shiftPremiumRate)}/hr)</span>
+          <span className={`text-xs px-2 py-0.5 rounded-full ${applyPremium ? "bg-white/20 text-white" : "bg-zinc-100 text-zinc-500"}`}>
+            {applyPremium ? "Applied" : "Not applied"}
+          </span>
+        </button>
+      )}
+
       {/* Live preview */}
       {hours > 0 && (
         <div className="bg-zinc-100 rounded-xl px-4 py-3 flex justify-between items-center">
@@ -153,7 +176,9 @@ export default function LogHoursForm({
               {hours % 1 === 0 ? hours.toFixed(0) : hours.toFixed(2)} hours
             </p>
             <p className="text-xs text-zinc-500 mt-0.5">
-              {breakMinutes > 0 ? `${breakMinutes} min break deducted · ` : ""}Estimated pay
+              {breakMinutes > 0 ? `${breakMinutes} min break deducted · ` : ""}
+              {applyPremium ? `incl. ${fmtCurrency(premiumPay)} premium · ` : ""}
+              Estimated pay
             </p>
           </div>
           <p className="text-lg font-bold text-zinc-900">{fmtCurrency(estimatedPay)}</p>

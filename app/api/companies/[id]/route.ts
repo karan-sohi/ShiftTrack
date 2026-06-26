@@ -85,6 +85,12 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/companies/
       return NextResponse.json({ error: "breakMinutes must be 0–120" }, { status: 400 });
     data.breakMinutes = mins;
   }
+  if (body.shiftPremiumRate !== undefined) {
+    const rate = Number(body.shiftPremiumRate);
+    if (isNaN(rate) || rate < 0)
+      return NextResponse.json({ error: "shiftPremiumRate must be ≥ 0" }, { status: 400 });
+    data.shiftPremiumRate = rate;
+  }
 
   try {
     const updated = await prisma.company.update({ where: { id: company!.id }, data });

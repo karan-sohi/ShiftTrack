@@ -7,7 +7,8 @@ async function getCompanyForSession(req: NextRequest) {
   if (!session) return null;
   return prisma.company.findFirst({
     where: { userId: session.userId, isActive: true },
-  }) ?? prisma.company.findFirst({ where: { userId: session.userId } });
+    orderBy: { createdAt: "desc" },
+  }) ?? prisma.company.findFirst({ where: { userId: session.userId }, orderBy: { createdAt: "desc" } });
 }
 
 export async function GET(req: NextRequest) {
@@ -30,7 +31,8 @@ export async function PATCH(req: NextRequest) {
 
   const company = await prisma.company.findFirst({
     where: { userId: session.userId, isActive: true },
-  }) ?? await prisma.company.findFirst({ where: { userId: session.userId } });
+    orderBy: { createdAt: "desc" },
+  }) ?? await prisma.company.findFirst({ where: { userId: session.userId }, orderBy: { createdAt: "desc" } });
   if (!company) return NextResponse.json({ error: "No company found" }, { status: 404 });
 
   const body = await req.json().catch(() => null);

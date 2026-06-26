@@ -27,6 +27,7 @@ export type CompanyFormData = {
   anchorPayday: string;
   timezone: string;
   breakMinutes: number;
+  shiftPremiumRate: string;
 };
 
 type Props = {
@@ -54,6 +55,7 @@ const DEFAULTS: CompanyFormData = {
   anchorPayday: "",
   timezone: "America/Chicago",
   breakMinutes: 0,
+  shiftPremiumRate: "",
 };
 
 export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Props) {
@@ -101,6 +103,7 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
       anchorPayday: form.anchorPayday,
       timezone: form.timezone,
       breakMinutes: form.breakMinutes,
+      shiftPremiumRate: parseFloat(form.shiftPremiumRate) || 0,
     };
 
     const res = await fetch(
@@ -228,6 +231,29 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
           className="h-12 rounded-xl border border-zinc-200 bg-white px-4 text-zinc-900
                      placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900"
         />
+      </div>
+
+      {/* Shift premium */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium text-zinc-700">
+          Shift premium <span className="text-zinc-400 font-normal">(optional)</span>
+        </label>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="0.25"
+            value={form.shiftPremiumRate}
+            onChange={(e) => set("shiftPremiumRate", e.target.value)}
+            placeholder="0.00"
+            className="h-12 w-full rounded-xl border border-zinc-200 bg-white pl-8 pr-16 text-zinc-900
+                       placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">/hr</span>
+        </div>
+        <p className="text-xs text-zinc-400">Extra pay per hour for eligible shifts (e.g. night differential)</p>
       </div>
 
       {/* Overtime */}

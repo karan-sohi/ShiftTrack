@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
         anchorPayday: new Date(body.anchorPayday),
         timezone: typeof body.timezone === "string" ? body.timezone : "America/Chicago",
         breakMinutes: typeof body.breakMinutes === "number" && body.breakMinutes >= 0 ? body.breakMinutes : 0,
+        shiftPremiumRate: typeof body.shiftPremiumRate === "number" && body.shiftPremiumRate >= 0 ? body.shiftPremiumRate : 0,
       },
     });
     return NextResponse.json(company, { status: 201 });

@@ -46,6 +46,8 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/shifts/[id
     return NextResponse.json({ error: "Times must be HH:MM format" }, { status: 400 });
 
   const hoursWorked = computeShiftHours(newStart, newEnd, company.breakMinutes);
+  const applyPremium = body.applyPremium !== undefined ? Boolean(body.applyPremium) : Number(shift.premiumPay) > 0;
+  const premiumPay = applyPremium ? Number(company.shiftPremiumRate) * hoursWorked : 0;
   let overtimeHours = 0;
 
   if (company.overtimeRule === "DAILY_OVER_8") {
@@ -66,6 +68,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/shifts/[id
       endTime: newEnd,
       hoursWorked,
       overtimeHours,
+      premiumPay,
       note: body.note !== undefined ? body.note : shift.note,
     },
   });

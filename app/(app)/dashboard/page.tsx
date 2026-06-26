@@ -27,7 +27,8 @@ export default async function DashboardPage() {
 
   const company = await prisma.company.findFirst({
     where: { userId: session.userId, isActive: true },
-  }) ?? await prisma.company.findFirst({ where: { userId: session.userId } });
+    orderBy: { createdAt: "desc" },
+  }) ?? await prisma.company.findFirst({ where: { userId: session.userId }, orderBy: { createdAt: "desc" } });
 
   if (!company) redirect("/company/setup");
 
@@ -59,9 +60,10 @@ export default async function DashboardPage() {
   const regularHours = totalHours - totalOT;
   const rate = Number(company.hourlyRate);
   const mult = Number(company.overtimeMultiplier);
+  const totalPremium = shifts.reduce((sum: number, r: Shift) => sum + Number(r.premiumPay), 0);
   const regularPay = regularHours * rate;
   const otPay = totalOT * rate * mult;
-  const totalPay = regularPay + otPay;
+  const totalPay = regularPay + otPay + totalPremium;
 
   const workdaysInPeriod = countWorkdaysInPeriod(period.periodStart, period.periodEnd, company.workdays);
   const expectedHours = workdaysInPeriod * shiftLength;
@@ -160,6 +162,12 @@ export default async function DashboardPage() {
                 <span className="text-zinc-700">{fmtCurrency(otPay)}</span>
               </div>
             )}
+            {totalPremium > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-zinc-500">Shift premium</span>
+                <span className="text-zinc-700">{fmtCurrency(totalPremium)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-sm font-bold pt-1 border-t border-zinc-100">
               <span className="text-zinc-900">Estimated total</span>
               <span className="text-zinc-900">{fmtCurrency(totalPay)}</span>
@@ -185,7 +193,8 @@ export default async function DashboardPage() {
             {shifts.map((s: Shift) => {
               const ot = Number(s.overtimeHours);
               const hrs = Number(s.hoursWorked);
-              const pay = (hrs - ot) * rate + ot * rate * mult;
+              const premium = Number(s.premiumPay);
+              const pay = (hrs - ot) * rate + ot * rate * mult + premium;
               return (
                 <Link
                   key={s.id}

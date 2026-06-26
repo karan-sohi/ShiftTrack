@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
     overtimeHours: number;
     regularPay: number;
     otPay: number;
+    premiumPay: number;
     dayPay: number;
     note: string | null;
   };
@@ -92,6 +93,7 @@ export async function GET(req: NextRequest) {
       const reg = h - ot;
       const regPay = reg * rate;
       const otPayAmt = ot * rate * mult;
+      const premAmt = Number(s.premiumPay);
       totalHours += h;
       totalOT += ot;
 
@@ -102,7 +104,8 @@ export async function GET(req: NextRequest) {
         overtimeHours: ot,
         regularPay: regPay,
         otPay: otPayAmt,
-        dayPay: regPay + otPayAmt,
+        premiumPay: premAmt,
+        dayPay: regPay + otPayAmt + premAmt,
         note: s.note,
       });
     }
@@ -114,6 +117,7 @@ export async function GET(req: NextRequest) {
       const reg = h - ot;
       const regPay = reg * rate;
       const otPayAmt = ot * rate * mult;
+      const premAmt = Number(s.premiumPay);
       totalHours += h;
       totalOT += ot;
 
@@ -124,16 +128,18 @@ export async function GET(req: NextRequest) {
         overtimeHours: ot,
         regularPay: regPay,
         otPay: otPayAmt,
-        dayPay: regPay + otPayAmt,
+        premiumPay: premAmt,
+        dayPay: regPay + otPayAmt + premAmt,
         note: s.note,
       });
     }
   }
 
   const regularHours = totalHours - totalOT;
+  const totalPremium = dailyBreakdown.reduce((sum, d) => sum + d.premiumPay, 0);
   const regularPay = regularHours * rate;
   const otPay = totalOT * rate * mult;
-  const grossPay = regularPay + otPay;
+  const grossPay = regularPay + otPay + totalPremium;
 
   return NextResponse.json({
     periodStart: toISODate(period.periodStart),
@@ -146,6 +152,7 @@ export async function GET(req: NextRequest) {
     overtimeHours: totalOT,
     regularPay,
     otPay,
+    premiumPay: totalPremium,
     grossPay,
     dailyBreakdown,
   });

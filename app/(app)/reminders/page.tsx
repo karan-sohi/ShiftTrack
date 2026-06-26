@@ -13,7 +13,8 @@ export default async function RemindersPage() {
 
   const company = await prisma.company.findFirst({
     where: { userId: session.userId, isActive: true },
-  }) ?? await prisma.company.findFirst({ where: { userId: session.userId } });
+    orderBy: { createdAt: "desc" },
+  }) ?? await prisma.company.findFirst({ where: { userId: session.userId }, orderBy: { createdAt: "desc" } });
 
   if (!company) redirect("/company/setup");
 

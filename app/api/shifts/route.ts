@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Request body required" }, { status: 400 });
 
-  const { companyId, workDate, startTime, endTime, note, isScheduled } = body;
+  const { companyId, workDate, startTime, endTime, note, isScheduled, applyPremium } = body;
 
   if (!companyId || !workDate || !startTime || !endTime)
     return NextResponse.json({ error: "companyId, workDate, startTime, endTime are required" }, { status: 400 });
@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Company not found" }, { status: 404 });
 
   const hoursWorked = computeShiftHours(startTime, endTime, company.breakMinutes);
+  const premiumPay = applyPremium ? Number(company.shiftPremiumRate) * hoursWorked : 0;
   let overtimeHours = 0;
 
   if (company.overtimeRule === "DAILY_OVER_8") {
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
       endTime,
       hoursWorked,
       overtimeHours,
+      premiumPay,
       note: note ?? null,
       isScheduled: isScheduled ?? false,
     },
