@@ -71,9 +71,11 @@ export default async function PaydaySummaryPage({
   const otPay        = totalOT * rate * mult;
   const grossPay     = regularPay + otPay + totalPremium;
 
-  // Tax calculation — only for CA with a province set
+  // Tax calculation — only for CA with a province set.
+  // Uses hourlyRate × 2,080 hrs (full-time equivalent) to determine the tax bracket,
+  // so the effective rate reflects a typical annual income rather than this period's hours alone.
   const tax = (taxProfile?.country === "CA" && taxProfile.region)
-    ? calculateCanadaPeriodTax(grossPay, periodsPerYear(company.payFrequency), taxProfile.region)
+    ? calculateCanadaPeriodTax(grossPay, periodsPerYear(company.payFrequency), taxProfile.region, rate)
     : null;
 
   return (

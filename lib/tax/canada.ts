@@ -208,19 +208,26 @@ export function calculateCanadaPeriodTax(
   grossPay: number,
   periodsPerYear: number,
   province: string,
+  hourlyRate: number,
 ): TaxBreakdown | null {
   const config = PROVINCE_CONFIGS[province];
   if (!config) return null;
 
-  const annual = grossPay * periodsPerYear;
+  // Estimate annual income assuming full-time: 8h/day × 5 days/week × 52 weeks.
+  // This gives a stable tax bracket regardless of how many hours were in this period.
+  const estimatedAnnual = hourlyRate * 8 * 5 * 52;
 
-  // Federal income tax
-  let fedTaxAnnual = applyBrackets(annual, FED_BRACKETS) - FED_BPA * 0.15;
+  // Actual annualized earnings — used only for CPP/EI caps, which scale with real earnings.
+  const actualAnnual = grossPay * periodsPerYear;
+
+  // Federal income tax — derive effective rate from estimated annual income
+  let fedTaxAnnual = applyBrackets(estimatedAnnual, FED_BRACKETS) - FED_BPA * 0.15;
   fedTaxAnnual = Math.max(0, fedTaxAnnual);
   if (config.usesQPP) fedTaxAnnual *= 1 - 0.165; // Quebec abatement
+  const effectiveFedRate = fedTaxAnnual / estimatedAnnual;
 
-  // Provincial income tax
-  let provTaxAnnual = applyBrackets(annual, config.brackets) - config.bpa * config.lowestRate;
+  // Provincial income tax — same approach
+  let provTaxAnnual = applyBrackets(estimatedAnnual, config.brackets) - config.bpa * config.lowestRate;
   provTaxAnnual = Math.max(0, provTaxAnnual);
   if (config.ontarioSurtax) {
     let surtax = 0;
@@ -228,20 +235,23 @@ export function calculateCanadaPeriodTax(
     if (provTaxAnnual > 6_802) surtax += (provTaxAnnual - 6_802) * 0.36;
     provTaxAnnual += surtax;
   }
+  const effectiveProvRate = provTaxAnnual / estimatedAnnual;
 
-  // CPP or QPP
+  // Apply effective rates to this period's actual gross pay
+  const fedTax  = grossPay * effectiveFedRate;
+  const provTax = grossPay * effectiveProvRate;
+
+  // CPP or QPP — based on actual annualized earnings (has a yearly cap)
   const pensionRate = config.usesQPP ? QPP_RATE : CPP_RATE;
-  const pensionEligible = Math.max(0, Math.min(annual, CPP_YMPE) - CPP_EXEMPTION);
+  const pensionEligible = Math.max(0, Math.min(actualAnnual, CPP_YMPE) - CPP_EXEMPTION);
   const pensionAnnual = pensionEligible * pensionRate;
 
-  // EI
+  // EI — based on actual annualized earnings (has a yearly cap)
   const eiRate = config.usesQPP ? EI_QC_RATE : EI_RATE;
-  const eiAnnual = Math.min(annual, EI_MAX_INSURABLE) * eiRate;
+  const eiAnnual = Math.min(actualAnnual, EI_MAX_INSURABLE) * eiRate;
 
-  const fedTax    = fedTaxAnnual    / periodsPerYear;
-  const provTax   = provTaxAnnual   / periodsPerYear;
-  const cpp       = pensionAnnual   / periodsPerYear;
-  const ei        = eiAnnual        / periodsPerYear;
+  const cpp = pensionAnnual / periodsPerYear;
+  const ei  = eiAnnual     / periodsPerYear;
   const totalDeductions = fedTax + provTax + cpp + ei;
 
   return {
