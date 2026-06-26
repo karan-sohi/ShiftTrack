@@ -31,9 +31,11 @@ export default async function EditCompanyPage({
 
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
-      <div className="flex items-center gap-3 px-4 pt-12 pb-6">
-        <h1 className="text-xl font-bold text-zinc-900">Edit company</h1>
-        <span className="text-zinc-400 text-sm">{company.name}</span>
+      <div className="px-4 pt-12 pb-6 flex items-center justify-between border-b border-zinc-100">
+        <div>
+          <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">Company settings</p>
+          <h1 className="text-2xl font-bold text-zinc-900 mt-0.5">{company.name}</h1>
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto px-4 pb-8">
         <CompanyForm initial={initial} companyId={company.id} redirectTo="/" />

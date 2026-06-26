@@ -76,19 +76,19 @@ export default async function PaydaySummaryPage({
   return (
     <div className="min-h-screen bg-zinc-50 pb-12">
       {/* Header */}
-      <div className="px-4 pt-12 pb-4 flex items-start justify-between">
+      <div className="px-4 pt-12 pb-4 flex items-start justify-between border-b border-zinc-100">
         <div>
-          <p className="text-xs text-zinc-400 font-medium uppercase tracking-wide">ShiftTrack</p>
-          <h1 className="text-xl font-bold text-zinc-900 mt-0.5">Payday Summary</h1>
+          <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">ShiftTrack</p>
+          <h1 className="text-2xl font-bold text-zinc-900 mt-0.5">Payday Summary</h1>
         </div>
-        <Link href="/dashboard" className="text-sm text-zinc-400 underline underline-offset-2 mt-1">
+        <Link href="/dashboard" className="text-sm font-medium text-zinc-500 mt-1.5 bg-zinc-100 px-3 py-1.5 rounded-lg active:bg-zinc-200 transition-colors">
           ← Back
         </Link>
       </div>
 
       {/* Period header card */}
       <section className="px-4 mt-2">
-        <div className="bg-white rounded-2xl border border-zinc-200 p-4">
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-zinc-500">
@@ -117,19 +117,19 @@ export default async function PaydaySummaryPage({
 
       {/* Gross pay hero */}
       <section className="px-4 mt-4">
-        <div className="bg-zinc-900 rounded-2xl p-5 text-center">
-          <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">
+        <div className="bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-2xl p-6 text-center shadow-lg">
+          <p className="text-xs font-medium text-zinc-400 uppercase tracking-widest mb-2">
             {locked ? "Gross pay" : "Estimated gross pay"}
           </p>
-          <p className="text-4xl font-bold text-white">{fmtCurrency(grossPay)}</p>
-          <p className="text-sm text-zinc-400 mt-1">{fmtHours(totalHours)} total</p>
+          <p className="text-5xl font-bold text-white tracking-tight">{fmtCurrency(grossPay)}</p>
+          <p className="text-sm text-zinc-400 mt-2">{fmtHours(totalHours)} total · {shifts.length} shift{shifts.length !== 1 ? "s" : ""}</p>
         </div>
       </section>
 
       {/* Pay breakdown */}
       <section className="px-4 mt-4">
-        <p className="text-xs text-zinc-400 uppercase tracking-wide mb-2">Pay breakdown</p>
-        <div className="bg-white rounded-2xl border border-zinc-200 p-4 space-y-3">
+        <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-2">Pay breakdown</p>
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 space-y-3">
           <div className="flex justify-between text-sm">
             <span className="text-zinc-500">
               Regular ({fmtHours(regularHours)} × {fmtCurrency(rate)})
@@ -159,11 +159,11 @@ export default async function PaydaySummaryPage({
 
       {/* Daily breakdown */}
       <section className="px-4 mt-4">
-        <p className="text-xs text-zinc-400 uppercase tracking-wide mb-2">
+        <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-2">
           Daily breakdown · {shifts.length} shift{shifts.length !== 1 ? "s" : ""}
         </p>
         {shifts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-zinc-200 p-8 text-center">
+          <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-8 text-center">
             <p className="text-sm text-zinc-400">No shifts logged this period.</p>
             {!locked && (
               <Link
@@ -185,7 +185,7 @@ export default async function PaydaySummaryPage({
               return (
                 <div
                   key={s.id}
-                  className="bg-white rounded-2xl border border-zinc-200 p-4"
+                  className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4"
                 >
                   <div className="flex items-start justify-between">
                     <div>

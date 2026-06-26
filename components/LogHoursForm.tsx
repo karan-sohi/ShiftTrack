@@ -60,7 +60,7 @@ export default function LogHoursForm({
   const premiumPay = applyPremium ? shiftPremiumRate * hours : 0;
   const estimatedPay = hours * hourlyRate + premiumPay;
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     if (!date || !start || !end) return setError("Date, start, and end time required");
@@ -170,18 +170,18 @@ export default function LogHoursForm({
 
       {/* Live preview */}
       {hours > 0 && (
-        <div className="bg-zinc-100 rounded-xl px-4 py-3 flex justify-between items-center">
+        <div className="bg-emerald-50 rounded-xl px-4 py-3.5 flex justify-between items-center">
           <div>
-            <p className="text-sm font-semibold text-zinc-900">
+            <p className="text-sm font-semibold text-emerald-900">
               {hours % 1 === 0 ? hours.toFixed(0) : hours.toFixed(2)} hours
             </p>
-            <p className="text-xs text-zinc-500 mt-0.5">
+            <p className="text-xs text-emerald-700/70 mt-0.5">
               {breakMinutes > 0 ? `${breakMinutes} min break deducted · ` : ""}
               {applyPremium ? `incl. ${fmtCurrency(premiumPay)} premium · ` : ""}
               Estimated pay
             </p>
           </div>
-          <p className="text-lg font-bold text-zinc-900">{fmtCurrency(estimatedPay)}</p>
+          <p className="text-2xl font-bold text-emerald-800">{fmtCurrency(estimatedPay)}</p>
         </div>
       )}
 

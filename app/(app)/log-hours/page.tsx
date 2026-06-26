@@ -30,13 +30,13 @@ export default async function LogHoursPage({
 
     return (
       <div className="min-h-screen bg-zinc-50">
-        <div className="px-4 pt-12 pb-6 flex items-center gap-3">
-          <Link href="/dashboard" className="text-zinc-400 text-sm underline underline-offset-2">
+        <div className="px-4 pt-12 pb-6 flex items-center justify-between border-b border-zinc-100">
+          <h1 className="text-2xl font-bold text-zinc-900">Edit shift</h1>
+          <Link href="/dashboard" className="text-sm font-medium text-zinc-500 bg-zinc-100 px-3 py-1.5 rounded-lg active:bg-zinc-200 transition-colors">
             ← Back
           </Link>
-          <h1 className="text-xl font-bold text-zinc-900">Edit shift</h1>
         </div>
-        <div className="px-4">
+        <div className="px-4 pt-6 pb-12">
           <LogHoursForm
             companyId={company.id}
             hourlyRate={Number(company.hourlyRate)}
@@ -58,13 +58,13 @@ export default async function LogHoursPage({
   // Create mode
   return (
     <div className="min-h-screen bg-zinc-50">
-      <div className="px-4 pt-12 pb-6 flex items-center gap-3">
-        <Link href="/dashboard" className="text-zinc-400 text-sm underline underline-offset-2">
+      <div className="px-4 pt-12 pb-6 flex items-center justify-between border-b border-zinc-100">
+        <h1 className="text-2xl font-bold text-zinc-900">Log hours</h1>
+        <Link href="/dashboard" className="text-sm font-medium text-zinc-500 bg-zinc-100 px-3 py-1.5 rounded-lg active:bg-zinc-200 transition-colors">
           ← Back
         </Link>
-        <h1 className="text-xl font-bold text-zinc-900">Log hours</h1>
       </div>
-      <div className="px-4">
+      <div className="px-4 pt-6 pb-12">
         <LogHoursForm
           companyId={company.id}
           hourlyRate={Number(company.hourlyRate)}
@@ -74,6 +74,7 @@ export default async function LogHoursPage({
           defaultDate={date ?? today}
           defaultStart={company.startTime}
           defaultEnd={company.endTime}
+          defaultPremium={Number(company.shiftPremiumRate) > 0}
         />
       </div>
     </div>

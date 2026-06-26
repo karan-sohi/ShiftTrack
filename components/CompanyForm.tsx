@@ -80,7 +80,7 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
     );
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
 
@@ -332,7 +332,7 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
       <button
         type="submit"
         disabled={loading}
-        className="h-12 rounded-xl bg-zinc-900 text-white font-medium text-sm
+        className="h-12 rounded-xl bg-zinc-900 text-white font-semibold text-sm shadow-sm
                    disabled:opacity-50 active:bg-zinc-700 transition-colors"
       >
         {loading ? "Saving…" : isEdit ? "Save changes" : "Create company"}

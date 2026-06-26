@@ -70,17 +70,17 @@ export default async function DashboardPage() {
   const progressPct = expectedHours > 0 ? Math.min(100, (totalHours / expectedHours) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-12">
+    <div className="min-h-screen bg-zinc-50 pb-28">
       {/* Header */}
-      <div className="px-4 pt-12 pb-4 flex items-start justify-between">
+      <div className="px-4 pt-12 pb-4 flex items-start justify-between border-b border-zinc-100">
         <div>
-          <p className="text-xs text-zinc-400 font-medium uppercase tracking-wide">ShiftTrack</p>
-          <h1 className="text-xl font-bold text-zinc-900 mt-0.5">{company.name}</h1>
+          <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">ShiftTrack</p>
+          <h1 className="text-2xl font-bold text-zinc-900 mt-0.5">{company.name}</h1>
         </div>
         {!locked && (
           <Link
             href="/log-hours"
-            className="bg-zinc-900 text-white text-sm font-medium px-4 py-2 rounded-xl active:bg-zinc-700"
+            className="bg-zinc-900 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm active:bg-zinc-700 transition-colors"
           >
             + Log hours
           </Link>
@@ -88,10 +88,10 @@ export default async function DashboardPage() {
       </div>
 
       {/* Today */}
-      <section className="px-4 mt-2">
-        <p className="text-xs text-zinc-400 uppercase tracking-wide mb-2">Today</p>
-        <div className="bg-white rounded-2xl border border-zinc-200 p-4">
-          <p className="font-medium text-zinc-900 text-sm">{fmtFull(today)}</p>
+      <section className="px-4 mt-4">
+        <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-2">Today</p>
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4">
+          <p className="font-semibold text-zinc-900">{fmtFull(today)}</p>
 
           {isTodayWorkday ? (
             <p className="text-sm text-zinc-500 mt-1">
@@ -102,18 +102,21 @@ export default async function DashboardPage() {
           )}
 
           {todayShift ? (
-            <div className="mt-3 flex items-center justify-between bg-green-50 rounded-xl px-3 py-2">
-              <p className="text-sm text-green-700 font-medium">
+            <div className="mt-3 flex items-center justify-between bg-emerald-50 rounded-xl px-3 py-2.5">
+              <p className="text-sm text-emerald-700 font-medium">
                 Logged {todayShift.startTime} – {todayShift.endTime} · {fmtHours(Number(todayShift.hoursWorked))}
               </p>
-              <Link href={`/log-hours?shiftId=${todayShift.id}`} className="text-xs text-zinc-500 underline underline-offset-2">
+              <Link
+                href={`/log-hours?shiftId=${todayShift.id}`}
+                className="text-xs font-medium text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg"
+              >
                 Edit
               </Link>
             </div>
           ) : isTodayWorkday && !locked ? (
             <Link
               href={`/log-hours?date=${todayStr}`}
-              className="mt-3 flex items-center justify-center h-11 rounded-xl bg-zinc-900 text-white text-sm font-medium"
+              className="mt-3 flex items-center justify-center h-11 rounded-xl bg-zinc-900 text-white text-sm font-semibold shadow-sm active:bg-zinc-700 transition-colors"
             >
               Log today's hours
             </Link>
@@ -124,25 +127,27 @@ export default async function DashboardPage() {
       {/* Pay period + progress */}
       <section className="px-4 mt-4">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs text-zinc-400 uppercase tracking-wide">Pay period</p>
+          <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Pay period</p>
           {locked && (
-            <span className="text-xs bg-zinc-100 text-zinc-500 px-2 py-0.5 rounded-full">Locked</span>
+            <span className="text-xs bg-zinc-100 text-zinc-500 px-2.5 py-0.5 rounded-full font-medium">Locked</span>
           )}
         </div>
-        <div className="bg-white rounded-2xl border border-zinc-200 p-4">
-          <p className="text-sm text-zinc-500">
-            {fmt(period.periodStart)} – {fmt(period.periodEnd)}
-            <span className="text-zinc-400"> · Payday {fmt(period.payday)}</span>
-          </p>
+        <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-zinc-700">
+              {fmt(period.periodStart)} – {fmt(period.periodEnd)}
+            </p>
+            <p className="text-xs text-zinc-400">Payday {fmt(period.payday)}</p>
+          </div>
 
           <div className="mt-4">
-            <div className="flex justify-between text-sm mb-1.5">
+            <div className="flex justify-between text-sm mb-2">
               <span className="text-zinc-500">Hours worked</span>
-              <span className="font-semibold text-zinc-900">{fmtHours(totalHours)}</span>
+              <span className="font-bold text-zinc-900">{fmtHours(totalHours)}</span>
             </div>
-            <div className="h-2.5 bg-zinc-100 rounded-full overflow-hidden">
+            <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-zinc-900 rounded-full transition-all"
+                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
@@ -151,7 +156,7 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-zinc-100 space-y-2">
+          <div className="mt-4 pt-4 border-t border-zinc-100 space-y-2.5">
             <div className="flex justify-between text-sm">
               <span className="text-zinc-500">Regular ({fmtHours(regularHours)} × {fmtCurrency(rate)})</span>
               <span className="text-zinc-700">{fmtCurrency(regularPay)}</span>
@@ -168,15 +173,15 @@ export default async function DashboardPage() {
                 <span className="text-zinc-700">{fmtCurrency(totalPremium)}</span>
               </div>
             )}
-            <div className="flex justify-between text-sm font-bold pt-1 border-t border-zinc-100">
-              <span className="text-zinc-900">Estimated total</span>
-              <span className="text-zinc-900">{fmtCurrency(totalPay)}</span>
+            <div className="flex justify-between items-baseline pt-2 border-t border-zinc-100">
+              <span className="text-sm font-semibold text-zinc-900">Estimated total</span>
+              <span className="text-2xl font-bold text-zinc-900">{fmtCurrency(totalPay)}</span>
             </div>
           </div>
 
           <Link
             href={`/payday/${periodEndStr}`}
-            className="mt-4 flex items-center justify-center h-10 rounded-xl bg-zinc-100 text-zinc-700 text-sm font-medium hover:bg-zinc-200 transition-colors"
+            className="mt-4 flex items-center justify-center h-11 rounded-xl bg-zinc-900 text-white text-sm font-semibold shadow-sm active:bg-zinc-700 transition-colors"
           >
             View payday summary →
           </Link>
@@ -185,9 +190,19 @@ export default async function DashboardPage() {
 
       {/* Shifts list */}
       <section className="px-4 mt-4">
-        <p className="text-xs text-zinc-400 uppercase tracking-wide mb-2">This period's shifts</p>
+        <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-2">This period's shifts</p>
         {shifts.length === 0 ? (
-          <p className="text-sm text-zinc-400 text-center py-10">No shifts logged yet this period.</p>
+          <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-8 text-center">
+            <p className="text-sm text-zinc-400">No shifts logged yet this period.</p>
+            {!locked && (
+              <Link
+                href="/log-hours"
+                className="mt-3 inline-block text-sm font-semibold text-zinc-900 underline underline-offset-2"
+              >
+                Log your first shift
+              </Link>
+            )}
+          </div>
         ) : (
           <div className="flex flex-col gap-2">
             {shifts.map((s: Shift) => {
@@ -199,17 +214,31 @@ export default async function DashboardPage() {
                 <Link
                   key={s.id}
                   href={locked ? "#" : `/log-hours?shiftId=${s.id}`}
-                  className="bg-white rounded-2xl border border-zinc-200 p-4 flex items-center justify-between"
+                  className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 flex items-center justify-between active:bg-zinc-50 transition-colors"
                 >
                   <div>
-                    <p className="text-sm font-medium text-zinc-900">
+                    <p className="text-sm font-semibold text-zinc-900">
                       {s.workDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
                     </p>
                     <p className="text-xs text-zinc-400 mt-0.5">{s.startTime} – {s.endTime}</p>
+                    {(ot > 0 || premium > 0) && (
+                      <div className="flex gap-1.5 mt-1.5">
+                        {ot > 0 && (
+                          <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium">
+                            {fmtHours(ot)} OT
+                          </span>
+                        )}
+                        {premium > 0 && (
+                          <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                            Premium
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-zinc-900">{fmtHours(hrs)}</p>
-                    <p className="text-xs text-zinc-400">{fmtCurrency(pay)}</p>
+                    <p className="text-base font-bold text-zinc-900">{fmtHours(hrs)}</p>
+                    <p className="text-sm text-zinc-500 mt-0.5">{fmtCurrency(pay)}</p>
                   </div>
                 </Link>
               );
@@ -218,15 +247,22 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      {/* Footer nav */}
-      <section className="px-4 mt-8 flex justify-center gap-6">
-        <Link href="/reminders" className="text-xs text-zinc-400 underline underline-offset-2">
-          Reminders
+      {/* Bottom nav */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 flex">
+        <Link
+          href="/reminders"
+          className="flex-1 flex flex-col items-center py-3.5 text-zinc-500 active:bg-zinc-50 transition-colors"
+        >
+          <span className="text-xs font-medium">Reminders</span>
         </Link>
-        <Link href={`/company/${company.id}/edit`} className="text-xs text-zinc-400 underline underline-offset-2">
-          Company settings
+        <div className="w-px bg-zinc-200" />
+        <Link
+          href={`/company/${company.id}/edit`}
+          className="flex-1 flex flex-col items-center py-3.5 text-zinc-500 active:bg-zinc-50 transition-colors"
+        >
+          <span className="text-xs font-medium">Company settings</span>
         </Link>
-      </section>
+      </nav>
     </div>
   );
 }
