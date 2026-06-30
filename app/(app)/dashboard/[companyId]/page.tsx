@@ -139,10 +139,13 @@ export default async function CompanyDashboardPage({
 
       {/* Header */}
       <div className="px-4 pt-12 pb-4 flex items-center justify-between border-b border-zinc-100">
-        <div>
+        <Link href="/companies" className="group">
           <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">ShiftTrack</p>
-          <h1 className="text-2xl font-bold text-zinc-900 mt-0.5">{company.name}</h1>
-        </div>
+          <div className="flex items-center gap-1 mt-0.5">
+            <h1 className="text-2xl font-bold text-zinc-900">{company.name}</h1>
+            <span className="text-zinc-400 text-sm mt-1">›</span>
+          </div>
+        </Link>
         <div className="flex items-center gap-2">
           <Link
             href="/account"

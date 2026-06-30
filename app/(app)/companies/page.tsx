@@ -13,7 +13,6 @@ export default async function CompaniesPage() {
   });
 
   if (companies.length === 0) redirect("/company/setup");
-  if (companies.length === 1) redirect(`/dashboard/${companies[0].id}`);
 
   return (
     <div className="min-h-screen bg-zinc-50 pb-12">
