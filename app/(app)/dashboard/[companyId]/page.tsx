@@ -139,13 +139,10 @@ export default async function CompanyDashboardPage({
 
       {/* Header */}
       <div className="px-4 pt-12 pb-4 flex items-center justify-between border-b border-zinc-100">
-        <Link href="/companies" className="group">
+        <div>
           <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">ShiftTrack</p>
-          <div className="flex items-center gap-1 mt-0.5">
-            <h1 className="text-2xl font-bold text-zinc-900">{company.name}</h1>
-            <span className="text-zinc-400 text-sm mt-1">›</span>
-          </div>
-        </Link>
+          <h1 className="text-2xl font-bold text-zinc-900 mt-0.5">{company.name}</h1>
+        </div>
         <div className="flex items-center gap-2">
           <Link
             href="/account"
@@ -211,6 +208,13 @@ export default async function CompanyDashboardPage({
 
       {/* Bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 flex">
+        <Link
+          href="/companies"
+          className="flex-1 flex flex-col items-center py-3.5 text-zinc-500 active:bg-zinc-50 transition-colors"
+        >
+          <span className="text-xs font-medium">Companies</span>
+        </Link>
+        <div className="w-px bg-zinc-200" />
         <Link
           href="/reminders"
           className="flex-1 flex flex-col items-center py-3.5 text-zinc-500 active:bg-zinc-50 transition-colors"
