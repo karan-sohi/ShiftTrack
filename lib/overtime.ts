@@ -30,12 +30,14 @@ export function computeWeeklyOvertimeForShift(
 }
 
 // Returns the Sun–Sat week boundary containing `date`.
+// `date` is a UTC-midnight @db.Date value, so this uses UTC methods throughout —
+// local-time methods would shift the boundary by a day when the server's
+// timezone is behind UTC.
 export function getWeekRange(date: Date): { weekStart: Date; weekEnd: Date } {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   const weekStart = new Date(d);
-  weekStart.setDate(d.getDate() - d.getDay()); // back to Sunday
+  weekStart.setUTCDate(d.getUTCDate() - d.getUTCDay()); // back to Sunday
   const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
   return { weekStart, weekEnd };
 }

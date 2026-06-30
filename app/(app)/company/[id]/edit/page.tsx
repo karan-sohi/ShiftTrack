@@ -7,7 +7,7 @@ import DeleteCompanyButton from "@/components/DeleteCompanyButton";
 import type { CompanyFormData } from "@/components/CompanyForm";
 
 function fmt(d: Date) {
-  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
 }
 
 export default async function EditCompanyPage({

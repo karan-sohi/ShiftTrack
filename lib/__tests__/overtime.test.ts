@@ -71,26 +71,29 @@ describe("computeWeeklyOvertimeForShift", () => {
   });
 });
 
+// workDate is a UTC-midnight @db.Date value in production, so tests build dates
+// with Date.UTC(...) and assert with UTC methods to match that contract
+// regardless of the machine's local timezone.
 describe("getWeekRange — overnight shift attribution", () => {
   it("returns weekStart on Sunday and weekEnd on Saturday", () => {
     // Nov 1, 2025 is a Saturday
-    const sat = new Date(2025, 10, 1); // month 10 = November
+    const sat = new Date(Date.UTC(2025, 10, 1)); // month 10 = November
     const { weekStart, weekEnd } = getWeekRange(sat);
-    expect(weekStart.getDay()).toBe(0); // Sunday
-    expect(weekEnd.getDay()).toBe(6);   // Saturday
+    expect(weekStart.getUTCDay()).toBe(0); // Sunday
+    expect(weekEnd.getUTCDay()).toBe(6);   // Saturday
   });
 
   it("overnight shift starting Sat Nov 1 ends in same week (not next)", () => {
-    const sat = new Date(2025, 10, 1);
+    const sat = new Date(Date.UTC(2025, 10, 1));
     const { weekEnd } = getWeekRange(sat);
     // weekEnd should be Nov 1 (same Saturday), not Nov 8
-    expect(weekEnd.getDate()).toBe(1);
-    expect(weekEnd.getMonth()).toBe(10); // November
+    expect(weekEnd.getUTCDate()).toBe(1);
+    expect(weekEnd.getUTCMonth()).toBe(10); // November
   });
 
   it("Sun in same week as following Sat", () => {
-    const sun = new Date(2025, 9, 26); // Oct 26, 2025 (Sunday)
-    const sat = new Date(2025, 10, 1); // Nov 1, 2025 (Saturday)
+    const sun = new Date(Date.UTC(2025, 9, 26)); // Oct 26, 2025 (Sunday)
+    const sat = new Date(Date.UTC(2025, 10, 1)); // Nov 1, 2025 (Saturday)
     const weekOfSun = getWeekRange(sun);
     const weekOfSat = getWeekRange(sat);
     expect(weekOfSun.weekStart.getTime()).toBe(weekOfSat.weekStart.getTime());

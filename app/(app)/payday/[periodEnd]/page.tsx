@@ -6,11 +6,11 @@ import { getPeriodForDate, isLocked } from "@/lib/pay-period";
 import { calculateCanadaPeriodTax, periodsPerYear } from "@/lib/tax";
 
 function fmt(d: Date) {
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 }
 
 function fmtFull(d: Date) {
-  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 }
 
 function fmtCurrency(n: number) {
@@ -46,7 +46,7 @@ export default async function PaydaySummaryPage({
 
   const parts = periodEndStr.split("-").map(Number);
   if (parts.length !== 3 || parts.some(isNaN)) notFound();
-  const periodEndDate = new Date(parts[0], parts[1] - 1, parts[2]);
+  const periodEndDate = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
 
   const period = getPeriodForDate(periodEndDate, company.anchorPayday);
   if (period.periodEnd.toISOString().split("T")[0] !== periodEndStr) notFound();

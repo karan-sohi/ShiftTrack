@@ -23,9 +23,9 @@ export async function GET(req: NextRequest) {
   if (!company || company.userId !== session.userId)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Parse periodEnd as local midnight
+  // Parse periodEnd as UTC midnight, matching how anchorPayday/workDate are stored
   const [y, mo, day] = periodEndStr.split("-").map(Number);
-  const periodEndDate = new Date(y, mo - 1, day);
+  const periodEndDate = new Date(Date.UTC(y, mo - 1, day));
   const period = getPeriodForDate(periodEndDate, company.anchorPayday);
 
   // Verify the provided periodEnd actually matches the computed period
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
 
       dailyBreakdown.push({
         date: toISODate(s.workDate),
-        dayOfWeek: s.workDate.toLocaleDateString("en-US", { weekday: "long" }),
+        dayOfWeek: s.workDate.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" }),
         hoursWorked: h,
         overtimeHours: ot,
         regularPay: regPay,
@@ -123,7 +123,7 @@ export async function GET(req: NextRequest) {
 
       dailyBreakdown.push({
         date: toISODate(s.workDate),
-        dayOfWeek: s.workDate.toLocaleDateString("en-US", { weekday: "long" }),
+        dayOfWeek: s.workDate.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" }),
         hoursWorked: h,
         overtimeHours: ot,
         regularPay: regPay,

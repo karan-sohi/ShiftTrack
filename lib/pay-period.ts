@@ -5,16 +5,17 @@ export type PayPeriod = {
   lockAt: Date;      // Monday (periodEnd + 2)
 };
 
+// All calendar-date arithmetic here operates in UTC. anchorPayday/workDate are
+// stored as UTC midnight (`@db.Date`), so local-time methods (getDate/setHours)
+// would shift dates by a day whenever the server's local timezone is behind UTC.
 function addDays(date: Date, days: number): Date {
   const d = new Date(date);
-  d.setDate(d.getDate() + days);
+  d.setUTCDate(d.getUTCDate() + days);
   return d;
 }
 
 function startOfDay(date: Date): Date {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d;
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 }
 
 // Find the biweekly Sun–Sat pay period that contains `date`.
@@ -49,8 +50,8 @@ export function countWorkdaysInPeriod(
   const d = startOfDay(start);
   const e = startOfDay(end);
   while (d <= e) {
-    if (workdays.includes(d.getDay())) count++;
-    d.setDate(d.getDate() + 1);
+    if (workdays.includes(d.getUTCDay())) count++;
+    d.setUTCDate(d.getUTCDate() + 1);
   }
   return count;
 }

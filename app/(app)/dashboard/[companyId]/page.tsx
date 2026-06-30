@@ -12,7 +12,7 @@ function toDateStr(d: Date) {
 }
 
 function fmtFull(date: Date) {
-  return date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  return date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
 }
 
 function fmtCurrency(n: number) {
@@ -45,8 +45,8 @@ export default async function CompanyDashboardPage({
 
   const userInitial = ((user?.username ?? user?.email) ?? "?")[0].toUpperCase();
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   const todayStr = toDateStr(today);
 
   const rate = Number(company.hourlyRate);
@@ -56,10 +56,10 @@ export default async function CompanyDashboardPage({
   // Compute 3 periods
   const periodCurrent = getPeriodForDate(today, company.anchorPayday);
   const dayBeforeLast = new Date(periodCurrent.periodStart);
-  dayBeforeLast.setDate(dayBeforeLast.getDate() - 1);
+  dayBeforeLast.setUTCDate(dayBeforeLast.getUTCDate() - 1);
   const periodLast = getPeriodForDate(dayBeforeLast, company.anchorPayday);
   const dayBeforePrev = new Date(periodLast.periodStart);
-  dayBeforePrev.setDate(dayBeforePrev.getDate() - 1);
+  dayBeforePrev.setUTCDate(dayBeforePrev.getUTCDate() - 1);
   const periodPrev = getPeriodForDate(dayBeforePrev, company.anchorPayday);
 
   // Fetch shifts for all 3 periods in parallel
@@ -130,7 +130,7 @@ export default async function CompanyDashboardPage({
 
   // Today info
   const todayShift = shiftsCurrent.find((s) => toDateStr(s.workDate) === todayStr);
-  const isTodayWorkday = company.workdays.includes(today.getDay());
+  const isTodayWorkday = company.workdays.includes(today.getUTCDay());
   const lockedCurrent = isLocked(periodCurrent);
 
   return (
