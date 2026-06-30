@@ -7,7 +7,6 @@ import {
   computeWeeklyOvertimeForShift,
   getWeekRange,
 } from "@/lib/overtime";
-import { getPeriodForDate, isLocked } from "@/lib/pay-period";
 
 async function getOwnedShift(req: NextRequest, id: string) {
   const session = getSessionFromRequest(req);
@@ -31,10 +30,6 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/shifts/[id
     return NextResponse.json({ error: result.error }, { status: result.status });
 
   const { shift, company } = result;
-
-  const period = getPeriodForDate(shift.workDate, company.anchorPayday);
-  if (isLocked(period))
-    return NextResponse.json({ error: "This pay period is locked" }, { status: 403 });
 
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Request body required" }, { status: 400 });
@@ -82,11 +77,7 @@ export async function DELETE(req: NextRequest, ctx: RouteContext<"/api/shifts/[i
   if ("error" in result)
     return NextResponse.json({ error: result.error }, { status: result.status });
 
-  const { shift, company } = result;
-
-  const period = getPeriodForDate(shift.workDate, company.anchorPayday);
-  if (isLocked(period))
-    return NextResponse.json({ error: "This pay period is locked" }, { status: 403 });
+  const { shift } = result;
 
   await prisma.shiftLog.delete({ where: { id: shift.id } });
   return NextResponse.json({ ok: true });

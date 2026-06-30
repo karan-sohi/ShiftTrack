@@ -160,14 +160,12 @@ export default function DashboardTabs({
         {p.shifts.length === 0 ? (
           <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-8 text-center">
             <p className="text-sm text-zinc-400">No shifts logged this period.</p>
-            {!p.locked && (
-              <Link
-                href={`/log-hours?companyId=${companyId}`}
-                className="mt-3 inline-block text-sm font-semibold text-zinc-900 underline underline-offset-2"
-              >
-                Log your first shift
-              </Link>
-            )}
+            <Link
+              href={`/log-hours?companyId=${companyId}`}
+              className="mt-3 inline-block text-sm font-semibold text-zinc-900 underline underline-offset-2"
+            >
+              Log your first shift
+            </Link>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -179,7 +177,7 @@ export default function DashboardTabs({
               return (
                 <Link
                   key={s.id}
-                  href={p.locked ? "#" : `/log-hours?shiftId=${s.id}&companyId=${companyId}`}
+                  href={`/log-hours?shiftId=${s.id}&companyId=${companyId}`}
                   className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 flex items-center justify-between active:bg-zinc-50 transition-colors"
                 >
                   <div>
