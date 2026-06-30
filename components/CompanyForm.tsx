@@ -33,7 +33,7 @@ export type CompanyFormData = {
 type Props = {
   initial?: Partial<CompanyFormData>;
   companyId?: string;
-  redirectTo?: string;
+  redirectTo?: string; // used only in edit mode
 };
 
 const BREAK_OPTIONS = [
@@ -88,11 +88,11 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
     if (!form.name.trim()) return setError("Company name required");
     if (isNaN(rate) || rate <= 0) return setError("Hourly rate must be greater than 0");
     if (form.workdays.length === 0) return setError("Select at least one workday");
-    if (!form.anchorPayday) return setError("Anchor payday required");
+    if (!isEdit && !form.anchorPayday) return setError("Next payday date required");
 
     setLoading(true);
 
-    const payload = {
+    const payload: Record<string, unknown> = {
       name: form.name.trim(),
       startTime: form.startTime,
       endTime: form.endTime,
@@ -100,11 +100,12 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
       hourlyRate: rate,
       overtimeRule: form.overtimeRule,
       overtimeMultiplier: parseFloat(form.overtimeMultiplier) || 1.5,
-      anchorPayday: form.anchorPayday,
       timezone: form.timezone,
       breakMinutes: form.breakMinutes,
       shiftPremiumRate: parseFloat(form.shiftPremiumRate) || 0,
     };
+    // anchorPayday is only sent on create — it cannot be changed after setup
+    if (!isEdit) payload.anchorPayday = form.anchorPayday;
 
     const res = await fetch(
       isEdit ? `/api/companies/${companyId}` : "/api/companies",
@@ -124,7 +125,12 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
       return;
     }
 
-    router.push(redirectTo);
+    if (isEdit) {
+      router.push(redirectTo ?? "/");
+    } else {
+      const created = await res.json().catch(() => null);
+      router.push(created?.id ? `/dashboard/${created.id}` : "/");
+    }
     router.refresh();
   }
 
@@ -298,18 +304,22 @@ export default function CompanyForm({ initial, companyId, redirectTo = "/" }: Pr
         )}
       </div>
 
-      {/* Anchor payday */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-zinc-700">Anchor payday</label>
-        <p className="text-xs text-zinc-400">Enter your next or most recent payday date.</p>
-        <input
-          type="date"
-          value={form.anchorPayday}
-          onChange={(e) => set("anchorPayday", e.target.value)}
-          className="h-12 rounded-xl border border-zinc-200 bg-white px-4 text-zinc-900
-                     focus:outline-none focus:ring-2 focus:ring-zinc-900"
-        />
-      </div>
+      {/* Anchor payday — create only */}
+      {!isEdit && (
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-zinc-700">Next payday date</label>
+          <p className="text-xs text-zinc-400">
+            Enter your next (or most recent) payday. This anchors your pay period calendar and cannot be changed later.
+          </p>
+          <input
+            type="date"
+            value={form.anchorPayday}
+            onChange={(e) => set("anchorPayday", e.target.value)}
+            className="h-12 rounded-xl border border-zinc-200 bg-white px-4 text-zinc-900
+                       focus:outline-none focus:ring-2 focus:ring-zinc-900"
+          />
+        </div>
+      )}
 
       {/* Timezone */}
       <div className="flex flex-col gap-1.5">

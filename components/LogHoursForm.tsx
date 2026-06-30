@@ -12,6 +12,7 @@ type Props = {
   defaultDate: string;
   defaultStart: string;
   defaultEnd: string;
+  redirectTo?: string;
   // edit mode
   shiftId?: string;
   defaultNote?: string;
@@ -39,6 +40,7 @@ export default function LogHoursForm({
   defaultDate,
   defaultStart,
   defaultEnd,
+  redirectTo = "/dashboard",
   shiftId,
   defaultNote = "",
   defaultPremium = false,
@@ -88,7 +90,7 @@ export default function LogHoursForm({
       return;
     }
 
-    router.push("/dashboard");
+    router.push(redirectTo);
     router.refresh();
   }
 
@@ -103,7 +105,7 @@ export default function LogHoursForm({
       setError(d.error ?? "Delete failed");
       return;
     }
-    router.push("/dashboard");
+    router.push(redirectTo);
     router.refresh();
   }
 

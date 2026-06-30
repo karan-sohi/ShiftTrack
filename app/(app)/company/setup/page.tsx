@@ -1,26 +1,21 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 import CompanyForm from "@/components/CompanyForm";
 
 export default async function CompanySetupPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const existing = await prisma.company.findFirst({
-    where: { userId: session.userId },
-    orderBy: { createdAt: "desc" },
-  });
-
-  if (existing) redirect(`/company/${existing.id}/edit`);
-
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
-      <div className="flex items-center gap-3 px-4 pt-12 pb-6">
-        <h1 className="text-xl font-bold text-zinc-900">Add company</h1>
+      <div className="px-4 pt-12 pb-6 flex items-center justify-between border-b border-zinc-100">
+        <h1 className="text-2xl font-bold text-zinc-900">Add company</h1>
+        <a href="/" className="text-sm font-medium text-zinc-500 bg-zinc-100 px-3 py-1.5 rounded-lg">
+          ← Back
+        </a>
       </div>
-      <div className="flex-1 overflow-y-auto px-4 pb-8">
-        <CompanyForm redirectTo="/" />
+      <div className="flex-1 overflow-y-auto px-4 py-6 pb-12">
+        <CompanyForm />
       </div>
     </div>
   );

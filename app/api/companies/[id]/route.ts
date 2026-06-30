@@ -68,11 +68,6 @@ export async function PATCH(req: NextRequest, ctx: RouteContext<"/api/companies/
       return NextResponse.json({ error: "Multiplier must be ≥ 1" }, { status: 400 });
     data.overtimeMultiplier = body.overtimeMultiplier;
   }
-  if (body.anchorPayday !== undefined) {
-    if (isNaN(Date.parse(body.anchorPayday)))
-      return NextResponse.json({ error: "Invalid anchor payday" }, { status: 400 });
-    data.anchorPayday = new Date(body.anchorPayday);
-  }
   if (body.isActive !== undefined) data.isActive = Boolean(body.isActive);
   if (body.timezone !== undefined) {
     if (typeof body.timezone !== "string" || !body.timezone.trim())
